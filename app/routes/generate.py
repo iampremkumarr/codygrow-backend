@@ -24,6 +24,7 @@ def generate_code(request: CodeGenerationRequest, user: User = Depends(get_curre
     try:
         dataset_info = analyze_dataset(dataset_path)
         context = f"""
+Dataset CSV File Name: {safe_filename}
 Columns: {dataset_info['headers']}
 Types & Nulls: {[ (col['column'], col['dtype'], col['missing']) for col in dataset_info.get('metadata', []) ]}
 Shape: {dataset_info.get('shape', 'N/A')}
@@ -39,15 +40,13 @@ Suggested Target: {dataset_info.get('suggested_target', 'N/A')}
             # Ensure we use forward slashes for Python path in generated script
             datasets_dir_for_code = settings.DATASETS_DIR.replace("\\", "/")
             dataset_path_for_code = f"{datasets_dir_for_code}/{safe_filename}"
-            code = code.replace(
-                f"pd.read_csv('{safe_filename}')",
-                f"pd.read_csv('{dataset_path_for_code}')"
-            )
-            if request.dataset_filename and request.dataset_filename != safe_filename:
-                code = code.replace(
-                    f"pd.read_csv('{request.dataset_filename}')",
-                    f"pd.read_csv('{dataset_path_for_code}')"
-                )
+            
+            # Robustly replace any pd.read_csv(...) references to load from the correct datasets folder
+            import re
+            for name in list(set([safe_filename, request.dataset_filename])):
+                if name:
+                    pattern = rf"pd\.read_csv\(\s*['\"](?:[^'\"]*/)?{re.escape(name)}['\"]"
+                    code = re.sub(pattern, f"pd.read_csv('{dataset_path_for_code}'", code)
         # 🚀 NEW: pass task for later use (optional)
         execution_result = execute_generated_code(code, task=request.task.lower())
 

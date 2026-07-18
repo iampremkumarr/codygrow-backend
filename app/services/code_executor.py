@@ -1,9 +1,11 @@
-import tempfile, subprocess, os, uuid, json
+import tempfile, subprocess, os, uuid, json, sys
 from app.services.output_handler import get_visual_outputs
+from app.config import settings
 
 def execute_generated_code(code: str, task: str = "classification") -> dict:
     run_id = uuid.uuid4().hex[:8]
-    script_path = f"generated/scripts/{run_id}.py"
+    os.makedirs(settings.SCRIPTS_DIR, exist_ok=True)
+    script_path = os.path.join(settings.SCRIPTS_DIR, f"{run_id}.py")
     output = {"stdout": "", "stderr": "", "success": False, "script_path": script_path}
 
     try:
@@ -13,7 +15,7 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
 
         # Run the code
         result = subprocess.run(
-            ["python", script_path],
+            [sys.executable, script_path],
             capture_output=True,
             text=True,
             timeout=90
@@ -37,7 +39,8 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
             visual_paths = []  # insert plot paths if applicable
 
             # Save metrics (optional for now)
-            metrics_path = f"generated/metrics/{run_id}.json"
+            os.makedirs(settings.METRICS_DIR, exist_ok=True)
+            metrics_path = os.path.join(settings.METRICS_DIR, f"{run_id}.json")
             with open(metrics_path, "w") as m:
                 json.dump(metrics, m, indent=2)
 

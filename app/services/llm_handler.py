@@ -35,7 +35,7 @@ def get_model_routing(user_tier: PlanType) -> dict:
     else:
         return {
             "primary": "tencent/hy3:free",
-            "fallback": "tencent/hy3:free",  # SAME = safe
+            "fallback": "tencent/hy3:free",
         }
 
 
@@ -51,7 +51,9 @@ def generate_code_with_openrouter(
         "You are a Python machine learning assistant. "
         "Use pandas, scikit-learn, and matplotlib. "
         "Return ONLY clean executable Python code. "
-        "No explanations. No markdown. No backticks."
+        "No explanations. No markdown. No backticks. "
+        "You MUST load the dataset from the specified 'Dataset CSV File Name' using pandas (e.g., pd.read_csv('filename.csv')). "
+        "Do NOT include mock datasets, hardcoded data arrays, or lists in the code."
     )
 
     user_message = f"Dataset context:\n{context}\n\nTask:\n{user_prompt}"
