@@ -29,6 +29,9 @@ Columns: {dataset_info['headers']}
 Types & Nulls: {[ (col['column'], col['dtype'], col['missing']) for col in dataset_info.get('metadata', []) ]}
 Shape: {dataset_info.get('shape', 'N/A')}
 Suggested Target: {dataset_info.get('suggested_target', 'N/A')}
+Task Type: {request.task}
+ML Type: {request.ml_type}
+Selected Algorithm: {request.model}
         """
 
         # Determine user tier
