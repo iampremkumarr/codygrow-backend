@@ -58,7 +58,8 @@ def generate_code_with_openrouter(
         "CRITICAL: If a Classification algorithm is requested but the target column contains continuous float values, you MUST convert it into discrete categories using pd.cut() with labeled bins before fitting the model. "
         "CRITICAL: When using classification_report(), NEVER pass target_names argument. Call it as classification_report(y_test, y_pred) only, to avoid class count mismatch errors. "
         "CRITICAL: Do NOT use plt.show() anywhere in the code. Use plt.savefig() to save figures to a file if needed, or omit plot saving entirely. plt.show() will hang in a serverless environment. "
-        "CRITICAL: You may ONLY import from these installed packages: pandas, numpy, scikit-learn (sklearn), matplotlib, seaborn, scipy, xgboost, lightgbm, catboost, umap-learn. Do NOT import any other library (e.g. tensorflow, torch, keras, statsmodels) as they are not installed and will cause a ModuleNotFoundError. "
+        "CRITICAL: You may ONLY import from these installed packages: pandas, numpy, scikit-learn (sklearn), matplotlib, seaborn, scipy, xgboost, lightgbm. Do NOT import any other library (e.g. tensorflow, torch, keras, catboost, umap, statsmodels) as they are NOT installed and will cause a ModuleNotFoundError. "
+        "CRITICAL: For CatBoost algorithms, use xgboost or lightgbm as a direct equivalent. For UMAP, use sklearn.manifold.TSNE as the equivalent. "
         "CRITICAL: For Deep Learning algorithms (CNN, RNN, LSTM, GRU, Transformer, GAN, Autoencoder), use sklearn.neural_network.MLPClassifier or MLPRegressor as the closest available equivalent. For Reinforcement Learning (Q-Learning, DQN, Policy Gradient, Actor-Critic), implement a simple tabular Q-learning or policy approach using only numpy and pandas — do NOT import torch, tensorflow, or gym."
     )
 
