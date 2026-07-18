@@ -7,6 +7,7 @@ from app.services.output_handler import get_visual_outputs
 from app.services.auth import get_current_user
 from app.models.user import User
 from app.models.plan import PlanType
+from app.config import settings
 from fastapi import Depends
 import os
 
@@ -15,7 +16,7 @@ router = APIRouter()
 def generate_code(request: CodeGenerationRequest, user: User = Depends(get_current_user)):
     # Extract only the base filename to prevent directory traversal
     safe_filename = os.path.basename(request.dataset_filename) if request.dataset_filename else ""
-    dataset_path = f"generated/datasets/{safe_filename}"
+    dataset_path = os.path.join(settings.DATASETS_DIR, safe_filename)
 
     if not safe_filename or not os.path.exists(dataset_path):
         return {"error": "Dataset file not found."}
@@ -35,14 +36,17 @@ Suggested Target: {dataset_info.get('suggested_target', 'N/A')}
 
         code = generate_code_with_openrouter(context, request.prompt, user_tier)
         if safe_filename:
+            # Ensure we use forward slashes for Python path in generated script
+            datasets_dir_for_code = settings.DATASETS_DIR.replace("\\", "/")
+            dataset_path_for_code = f"{datasets_dir_for_code}/{safe_filename}"
             code = code.replace(
                 f"pd.read_csv('{safe_filename}')",
-                f"pd.read_csv('generated/datasets/{safe_filename}')"
+                f"pd.read_csv('{dataset_path_for_code}')"
             )
             if request.dataset_filename and request.dataset_filename != safe_filename:
                 code = code.replace(
                     f"pd.read_csv('{request.dataset_filename}')",
-                    f"pd.read_csv('generated/datasets/{safe_filename}')"
+                    f"pd.read_csv('{dataset_path_for_code}')"
                 )
         # 🚀 NEW: pass task for later use (optional)
         execution_result = execute_generated_code(code, task=request.task.lower())

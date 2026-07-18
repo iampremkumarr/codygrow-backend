@@ -21,10 +21,14 @@ class Settings:
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
 
-    # File paths
-    DATASETS_DIR: str = os.getenv("DATASETS_DIR", "generated/datasets")
-    SCRIPTS_DIR: str = os.getenv("SCRIPTS_DIR", "generated/scripts")
-    OUTPUTS_DIR: str = os.getenv("OUTPUTS_DIR", "generated/outputs")
-    METRICS_DIR: str = os.getenv("METRICS_DIR", "generated/metrics")
+    # Vercel Serverless environment detection
+    IS_VERCEL: bool = os.getenv("VERCEL") == "1"
+
+    # File paths (use /tmp on Vercel to support read-only filesystem)
+    base_dir = "/tmp/generated" if os.getenv("VERCEL") == "1" else "generated"
+    DATASETS_DIR: str = os.getenv("DATASETS_DIR", f"{base_dir}/datasets")
+    SCRIPTS_DIR: str = os.getenv("SCRIPTS_DIR", f"{base_dir}/scripts")
+    OUTPUTS_DIR: str = os.getenv("OUTPUTS_DIR", f"{base_dir}/outputs")
+    METRICS_DIR: str = os.getenv("METRICS_DIR", f"{base_dir}/metrics")
 
 settings = Settings()

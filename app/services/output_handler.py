@@ -6,16 +6,15 @@ import os
 import uuid
 from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 import numpy as np
-
-# Ensure output directory exists
-os.makedirs("generated/outputs", exist_ok=True)
+from app.config import settings
 
 def save_plot(fig, prefix: str = "plot") -> str:
+    os.makedirs(settings.OUTPUTS_DIR, exist_ok=True)
     filename = f"{prefix}_{uuid.uuid4().hex[:8]}.png"
-    path = os.path.join("generated", "outputs", filename)
+    path = os.path.join(settings.OUTPUTS_DIR, filename)
     fig.savefig(path, bbox_inches='tight')
     plt.close(fig)
-    return path
+    return f"generated/outputs/{filename}"
 
 def get_visual_outputs(task: str, y_true, y_pred, model=None, X=None):
     visuals = []

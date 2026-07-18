@@ -31,9 +31,9 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 # Ensure the output directory exists
-os.makedirs("generated/outputs", exist_ok=True)
+os.makedirs(settings.OUTPUTS_DIR, exist_ok=True)
 # Mount only the outputs directory securely under the exact nested route expected by frontend
-app.mount("/api/outputs/generated/outputs", StaticFiles(directory="generated/outputs"), name="outputs")
+app.mount("/api/outputs/generated/outputs", StaticFiles(directory=settings.OUTPUTS_DIR), name="outputs")
 
 
 @app.get("/")

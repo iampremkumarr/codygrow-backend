@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.services.dataset_utils import analyze_dataset
+from app.config import settings
 import os
 import shutil
 import logging
@@ -7,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-DATASET_DIR = "generated/datasets"
+DATASET_DIR = settings.DATASETS_DIR
 
 @router.post("/dataset/upload")
 async def upload_dataset(file: UploadFile = File(...)):
