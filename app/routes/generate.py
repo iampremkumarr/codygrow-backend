@@ -1,14 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.models.schema import CodeGenerationRequest
 from app.services.dataset_utils import analyze_dataset
 from app.services.llm_handler import generate_code_with_openrouter
 from app.services.code_executor import execute_generated_code
-from app.services.output_handler import get_visual_outputs
+
 from app.services.auth import get_current_user
 from app.models.user import User
 from app.models.plan import PlanType
 from app.config import settings
-from fastapi import Depends
+
 import os
 
 router = APIRouter()

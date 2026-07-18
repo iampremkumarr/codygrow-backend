@@ -13,9 +13,22 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
         with open(script_path, "w") as f:
             f.write(code)
 
+        # Determine the correct Python interpreter (prefer virtual environment)
+        # Calculate backend root dir based on current file location: backend/app/services/code_executor.py
+        backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        venv_python_win = os.path.join(backend_dir, ".venv", "Scripts", "python.exe")
+        venv_python_unix = os.path.join(backend_dir, ".venv", "bin", "python")
+        
+        if os.path.exists(venv_python_win):
+            executable = venv_python_win
+        elif os.path.exists(venv_python_unix):
+            executable = venv_python_unix
+        else:
+            executable = sys.executable
+
         # Run the code
         result = subprocess.run(
-            [sys.executable, script_path],
+            [executable, script_path],
             capture_output=True,
             text=True,
             timeout=90

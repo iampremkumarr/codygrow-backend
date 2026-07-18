@@ -1,14 +1,15 @@
 # app/services/output_handler.py
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import seaborn as sns
 import os
 import uuid
-from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 import numpy as np
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from app.config import settings
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
 
 def save_plot(fig, prefix: str = "plot") -> str:
     os.makedirs(settings.OUTPUTS_DIR, exist_ok=True)
