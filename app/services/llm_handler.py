@@ -54,7 +54,8 @@ def generate_code_with_openrouter(
         "No explanations. No markdown. No backticks. "
         "You MUST load the dataset from the specified 'Dataset CSV File Name' using pandas (e.g., pd.read_csv('filename.csv')). "
         "Do NOT include mock datasets, hardcoded data arrays, or lists in the code. "
-        "CRITICAL: You MUST strictly use the exact machine learning algorithm specified by the user in the prompt (e.g., Naive Bayes, SVM, etc.). Do not substitute it with another algorithm like Random Forest."
+        "CRITICAL: You MUST strictly use the exact machine learning algorithm specified by the user in the prompt (e.g., Naive Bayes, SVM, etc.). Do not substitute it with another algorithm like Random Forest. "
+        "CRITICAL: If the user requests a Classification algorithm (like Naive Bayes) but the chosen target column contains continuous float values, you MUST convert the target column into discrete categories (e.g., using LabelEncoder or pd.cut) before fitting the model so the code does not crash."
     )
 
     user_message = f"Dataset context:\n{context}\n\nTask:\n{user_prompt}"
