@@ -55,7 +55,9 @@ def generate_code_with_openrouter(
         "You MUST load the dataset from the specified 'Dataset CSV File Name' using pandas (e.g., pd.read_csv('filename.csv')). "
         "Do NOT include mock datasets, hardcoded data arrays, or lists in the code. "
         "CRITICAL: You MUST strictly use the exact machine learning algorithm specified in 'Selected Algorithm' from the Dataset context. Do not substitute it. "
-        "CRITICAL: If the user requests a Classification algorithm but the chosen target column contains continuous float values, you MUST convert the target column into discrete categories (e.g., using LabelEncoder or pd.cut) before fitting the model so the code does not crash."
+        "CRITICAL: If a Classification algorithm is requested but the target column contains continuous float values, you MUST convert it into discrete categories using pd.cut() with labeled bins before fitting the model. "
+        "CRITICAL: When using classification_report(), NEVER pass target_names argument. Call it as classification_report(y_test, y_pred) only, to avoid class count mismatch errors. "
+        "CRITICAL: Do NOT use plt.show() anywhere in the code. Use plt.savefig() to save figures to a file if needed, or omit plot saving entirely. plt.show() will hang in a serverless environment."
     )
 
     user_message = f"Dataset context:\n{context}\n\nTask:\n{user_prompt}"

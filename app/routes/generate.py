@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from fastapi import APIRouter, Depends
 from app.models.schema import CodeGenerationRequest
 from app.services.dataset_utils import analyze_dataset
@@ -10,6 +11,7 @@ from app.models.plan import PlanType
 from app.config import settings
 
 import os
+import re
 
 router = APIRouter()
 @router.post("/generate")
@@ -45,7 +47,6 @@ Selected Algorithm: {request.model}
             dataset_path_for_code = f"{datasets_dir_for_code}/{safe_filename}"
             
             # Robustly replace any pd.read_csv(...) references to load from the correct datasets folder
-            import re
             for name in list(set([safe_filename, request.dataset_filename])):
                 if name:
                     pattern = rf"pd\.read_csv\(\s*['\"](?:[^'\"]*/)?{re.escape(name)}['\"]"

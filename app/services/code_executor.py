@@ -1,5 +1,5 @@
 import tempfile, subprocess, os, uuid, json, sys
-from app.services.output_handler import get_visual_outputs
+
 from app.config import settings
 
 def execute_generated_code(code: str, task: str = "classification") -> dict:

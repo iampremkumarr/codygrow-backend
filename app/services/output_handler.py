@@ -7,9 +7,9 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from app.config import settings
 
-import matplotlib
+import matplotlib # pyrefly: ignore [missing-import]
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.pyplot as plt  # pyrefly: ignore [missing-import]
 
 def save_plot(fig, prefix: str = "plot") -> str:
     os.makedirs(settings.OUTPUTS_DIR, exist_ok=True)
