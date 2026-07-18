@@ -8,6 +8,30 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
     script_path = os.path.join(settings.SCRIPTS_DIR, f"{run_id}.py")
     output = {"stdout": "", "stderr": "", "success": False, "script_path": script_path}
 
+    # Locate project root (backend/)
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+    # Default to current interpreter
+    python_exe = sys.executable
+
+    # Check if a local virtualenv python exists and use it
+    for venv_name in [".venv", "venv"]:
+        if sys.platform == "win32":
+            candidate = os.path.join(project_root, venv_name, "Scripts", "python.exe")
+        else:
+            candidate = os.path.join(project_root, venv_name, "bin", "python")
+        if os.path.exists(candidate):
+            python_exe = candidate
+            break
+
+    # Prepare headless matplotlib backend and local module imports path
+    env = os.environ.copy()
+    env["MPLBACKEND"] = "Agg"
+    if "PYTHONPATH" in env:
+        env["PYTHONPATH"] = f"{project_root}{os.pathsep}{env['PYTHONPATH']}"
+    else:
+        env["PYTHONPATH"] = project_root
+
     try:
         # Save the code
         with open(script_path, "w") as f:
@@ -15,10 +39,11 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
 
         # Run the code
         result = subprocess.run(
-            [sys.executable, script_path],
+            [python_exe, script_path],
             capture_output=True,
             text=True,
-            timeout=90
+            timeout=90,
+            env=env
         )
 
         output.update({
