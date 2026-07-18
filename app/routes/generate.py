@@ -25,12 +25,21 @@ def generate_code(request: CodeGenerationRequest, user: User = Depends(get_curre
 
     try:
         dataset_info = analyze_dataset(dataset_path)
+        # Find the dtype of the suggested target column
+        suggested_target = dataset_info.get('suggested_target', 'N/A')
+        target_dtype = 'N/A'
+        for col in dataset_info.get('metadata', []):
+            if col['column'] == suggested_target:
+                target_dtype = col['dtype']
+                break
+
         context = f"""
 Dataset CSV File Name: {safe_filename}
 Columns: {dataset_info['headers']}
 Types & Nulls: {[ (col['column'], col['dtype'], col['missing']) for col in dataset_info.get('metadata', []) ]}
 Shape: {dataset_info.get('shape', 'N/A')}
-Suggested Target: {dataset_info.get('suggested_target', 'N/A')}
+Suggested Target: {suggested_target}
+Suggested Target Dtype: {target_dtype}
 Task Type: {request.task}
 ML Type: {request.ml_type}
 Selected Algorithm: {request.model}

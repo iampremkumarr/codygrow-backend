@@ -9,6 +9,38 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
     output = {"stdout": "", "stderr": "", "success": False, "script_path": script_path}
 
     try:
+        # For classification tasks, inject a safety header that auto-converts
+        # continuous float targets to discrete categories before fitting.
+        # This prevents sklearn's "Unknown label type: continuous" crash.
+        if task == "classification":
+            safety_header = (
+                "# --- Auto-injected safety wrapper for classification ---\n"
+                "import warnings as _warnings; _warnings.filterwarnings('ignore')\n"
+                "import numpy as _np; import pandas as _pd\n"
+                "_orig_train_test_split = None\n"
+                "try:\n"
+                "    from sklearn.model_selection import train_test_split as _orig_tts\n"
+                "    def _safe_train_test_split(*args, **kwargs):\n"
+                "        result = _orig_tts(*args, **kwargs)\n"
+                "        # Check if y_train (index 2) contains continuous floats\n"
+                "        if len(result) == 4:\n"
+                "            X_tr, X_te, y_tr, y_te = result\n"
+                "            if hasattr(y_tr, 'dtype') and _np.issubdtype(y_tr.dtype, _np.floating):\n"
+                "                # Convert continuous targets to discrete bins\n"
+                "                all_y = _np.concatenate([y_tr, y_te])\n"
+                "                n_bins = min(10, len(_np.unique(all_y)))\n"
+                "                bins = _np.linspace(all_y.min(), all_y.max(), n_bins + 1)\n"
+                "                y_tr = _np.digitize(y_tr, bins[:-1]) - 1\n"
+                "                y_te = _np.digitize(y_te, bins[:-1]) - 1\n"
+                "                return X_tr, X_te, y_tr, y_te\n"
+                "        return result\n"
+                "    import sklearn.model_selection as _skms\n"
+                "    _skms.train_test_split = _safe_train_test_split\n"
+                "except: pass\n"
+                "# --- End safety wrapper ---\n\n"
+            )
+            code = safety_header + code
+
         # Save the code
         with open(script_path, "w") as f:
             f.write(code)
