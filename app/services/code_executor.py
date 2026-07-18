@@ -1,36 +1,10 @@
-import tempfile, subprocess, os, uuid, json, sys
+import tempfile, subprocess, os, uuid, json
 from app.services.output_handler import get_visual_outputs
-from app.config import settings
 
 def execute_generated_code(code: str, task: str = "classification") -> dict:
     run_id = uuid.uuid4().hex[:8]
-    os.makedirs(settings.SCRIPTS_DIR, exist_ok=True)
-    script_path = os.path.join(settings.SCRIPTS_DIR, f"{run_id}.py")
+    script_path = f"generated/scripts/{run_id}.py"
     output = {"stdout": "", "stderr": "", "success": False, "script_path": script_path}
-
-    # Locate project root (backend/)
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-    # Default to current interpreter
-    python_exe = sys.executable
-
-    # Check if a local virtualenv python exists and use it
-    for venv_name in [".venv", "venv"]:
-        if sys.platform == "win32":
-            candidate = os.path.join(project_root, venv_name, "Scripts", "python.exe")
-        else:
-            candidate = os.path.join(project_root, venv_name, "bin", "python")
-        if os.path.exists(candidate):
-            python_exe = candidate
-            break
-
-    # Prepare headless matplotlib backend and local module imports path
-    env = os.environ.copy()
-    env["MPLBACKEND"] = "Agg"
-    if "PYTHONPATH" in env:
-        env["PYTHONPATH"] = f"{project_root}{os.pathsep}{env['PYTHONPATH']}"
-    else:
-        env["PYTHONPATH"] = project_root
 
     try:
         # Save the code
@@ -39,11 +13,10 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
 
         # Run the code
         result = subprocess.run(
-            [python_exe, script_path],
+            ["python", script_path],
             capture_output=True,
             text=True,
-            timeout=90,
-            env=env
+            timeout=90
         )
 
         output.update({
@@ -64,8 +37,7 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
             visual_paths = []  # insert plot paths if applicable
 
             # Save metrics (optional for now)
-            os.makedirs(settings.METRICS_DIR, exist_ok=True)
-            metrics_path = os.path.join(settings.METRICS_DIR, f"{run_id}.json")
+            metrics_path = f"generated/metrics/{run_id}.json"
             with open(metrics_path, "w") as m:
                 json.dump(metrics, m, indent=2)
 
