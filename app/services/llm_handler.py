@@ -23,19 +23,19 @@ def get_model_routing(user_tier: PlanType) -> dict:
     if user_tier in (PlanType.premium,):
         return {
             "primary": "anthropic/claude-3.5-sonnet",
-            "fallback": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "fallback": "tencent/hy3:free",
         }
 
     elif user_tier in (PlanType.pro, PlanType.studio):
         return {
-            "primary": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            "fallback": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "primary": "tencent/hy3:free",
+            "fallback": "tencent/hy3:free",
         }
 
     else:
         return {
-            "primary": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            "fallback": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",  # SAME = safe
+            "primary": "tencent/hy3:free",
+            "fallback": "tencent/hy3:free",  # SAME = safe
         }
 
 
