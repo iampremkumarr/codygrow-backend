@@ -26,12 +26,17 @@ def execute_generated_code(code: str, task: str = "classification") -> dict:
         else:
             executable = sys.executable
 
+        # Ensure the subprocess inherits the parent's runtime python paths (crucial for Vercel/serverless environments)
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.pathsep.join(sys.path)
+
         # Run the code
         result = subprocess.run(
             [executable, script_path],
             capture_output=True,
             text=True,
-            timeout=90
+            timeout=90,
+            env=env
         )
 
         output.update({
